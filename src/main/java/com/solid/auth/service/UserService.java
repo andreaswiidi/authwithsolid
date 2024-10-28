@@ -1,5 +1,7 @@
 package com.solid.auth.service;
 
+import com.solid.auth.dto.LoginRequest;
+import com.solid.auth.dto.LoginResponse;
 import com.solid.auth.dto.RegisterRequest;
 import com.solid.auth.dto.RegisterResponse;
 import com.solid.auth.exception.BadRequestException;
@@ -16,6 +18,7 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final JWTService jwtService;
 
     @Transactional
     public RegisterResponse registerUser(RegisterRequest registerRequest){
@@ -43,6 +46,30 @@ public class UserService {
         result.setId(user.getId());
 
         return result;
+    }
+
+    @Transactional
+    public LoginResponse loginUser(LoginRequest loginRequest){
+        //check existing data username
+        Optional<Users> dataUser = userRepository.findByUsername(loginRequest.getUsername());
+        if(dataUser.isPresent()){
+            if (PasswordEncoderUtil.matches(loginRequest.getPassword(),dataUser.get().getPassword())){
+                String token = jwtService.generateToken(loginRequest.getUsername());
+                return new LoginResponse(token);
+            }
+        }else {
+            dataUser = userRepository.findByEmail(loginRequest.getEmail());
+            if(dataUser.isPresent()){
+                if (PasswordEncoderUtil.matches(loginRequest.getPassword(),dataUser.get().getPassword())){
+                    String token = jwtService.generateToken(loginRequest.getUsername());
+                    return new LoginResponse(token);
+                }
+            }
+            else {
+                throw new BadRequestException("Username or Email Not Found");
+            }
+        }
+        throw new BadRequestException("Invalid Password");
     }
 
 }

@@ -8,4 +8,8 @@ public class PasswordEncoderUtil {
     public static String toHash(String value) {
         return bCryptPasswordEncoder.encode(value);
     }
+
+    public static boolean matches(String rawPassword, String encodedPassword) {
+        return bCryptPasswordEncoder.matches(rawPassword, encodedPassword);
+    }
 }

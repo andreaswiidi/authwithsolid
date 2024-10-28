@@ -1,8 +1,6 @@
 package com.solid.auth.controller;
 
-import com.solid.auth.dto.RegisterRequest;
-import com.solid.auth.dto.RegisterResponse;
-import com.solid.auth.dto.ResponseWrapper;
+import com.solid.auth.dto.*;
 import com.solid.auth.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,5 +20,11 @@ public class UserController {
         return new ResponseWrapper<RegisterResponse>()
                 .success(userService.registerUser(request));
 
+    }
+
+    @PostMapping("/login")
+    public ResponseWrapper<LoginResponse>LoginUser(@RequestBody LoginRequest request){
+        return new ResponseWrapper<LoginResponse>()
+                .success(userService.loginUser(request));
     }
 }
