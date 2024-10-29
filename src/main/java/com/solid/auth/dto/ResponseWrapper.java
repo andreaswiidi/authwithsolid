@@ -5,9 +5,7 @@ import com.solid.auth.util.HelperUtil;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Setter
@@ -42,4 +40,21 @@ public class ResponseWrapper <T> {
 
         return this;
     }
+//
+//    public ResponseWrapper<T> fail(Map<String,String> message,T t) {
+//        ArrayList<Map<String, String>> listMessage = new ArrayList<>();
+//        listMessage.add(message);
+//
+//        this.data = (T) message;
+//
+//        if (HelperUtil.isArrayOrCollection(t)) {
+//            Map<String, Object> content = new HashMap<>();
+//            content.put("content", listMessage);
+//            this.data = (T) content;
+//        } else {
+//            this.data = t;
+//        }
+//
+//        return this;
+//    }
 }

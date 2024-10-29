@@ -1,7 +1,9 @@
 package com.solid.auth.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.solid.auth.dto.*;
 import com.solid.auth.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +18,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseWrapper<RegisterResponse> registerUser(@RequestBody RegisterRequest request) {
+    public ResponseWrapper<RegisterResponse> registerUser(@RequestBody @Valid RegisterRequest request) {
         return new ResponseWrapper<RegisterResponse>()
                 .success(userService.registerUser(request));
 
