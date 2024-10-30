@@ -5,6 +5,11 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * The purpose of this class is to store request for login
+ * S -> responsible for managing the LoginRequest
+ * why not cek the req in controller because it will be repetitive if this class used more than 1 controller
+ */
 
 @Getter
 @Setter

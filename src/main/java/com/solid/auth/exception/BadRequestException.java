@@ -4,6 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
+/**
+ * S -> responsibility is to encapsulate the HTTP status and error message.
+ * O -> it's not open for extension
+ * L,I -> because this class is the one that implementing
+ */
+
 @Getter
 @Setter
 public class BadRequestException extends RuntimeException {

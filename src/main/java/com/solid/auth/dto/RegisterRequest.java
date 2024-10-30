@@ -13,12 +13,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
-@GroupSequence({
-        NotNull.class,
-        NotBlank.class,
-        Email.class,
-        RegisterRequest.class
-})
+
 public class RegisterRequest implements Serializable {
     @NotNull(message = "Username is required", groups = NotNull.class)
     @NotBlank(message = "Username is required", groups = NotBlank.class)

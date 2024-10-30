@@ -20,14 +20,10 @@ public class JWTService {
     private Long expiration;
 
     public String generateToken(String username){
-        String token = JWT.create()
-                .withIssuer("your-app-name")
+        return JWT.create()
                 .withSubject("username")
-                .withClaim("role", "user")
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + expiration))
                 .sign(Algorithm.HMAC256(secret));
-
-        return token;
     }
 }

@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * S -> responsibility class handles exceptions related to the application.
+ * O -> you can add new @ExceptionHandler methods for different exceptions
+ */
+
 @RestControllerAdvice
 public class MessageExceptionHandler {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
