@@ -9,4 +9,6 @@ public class RegisterResponse {
     private Long id;
     private String username;
     private String email;
+    private String jwtToken;
+    private String refreshToken;
 }

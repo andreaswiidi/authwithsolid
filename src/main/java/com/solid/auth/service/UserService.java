@@ -5,6 +5,7 @@ import com.solid.auth.dto.LoginResponse;
 import com.solid.auth.dto.RegisterRequest;
 import com.solid.auth.dto.RegisterResponse;
 import com.solid.auth.exception.BadRequestException;
+import com.solid.auth.models.Session;
 import com.solid.auth.models.Users;
 import com.solid.auth.repository.UserRepository;
 import com.solid.auth.util.PasswordEncoderUtil;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final SessionService sessionService;
     private final JWTService jwtService;
 
     @Transactional
@@ -45,6 +47,10 @@ public class UserService {
         result.setUsername(user.getUsername());
         result.setId(user.getId());
 
+        Session session = sessionService.createSessionForUser(user.getId());
+        result.setJwtToken(jwtService.generateToken(user.getUsername(), session.getId()));
+        result.setRefreshToken(jwtService.generateRefreshToken(user.getUsername(), session.getId(), session.getExpSession()));
+
         return result;
     }
 
@@ -54,15 +60,17 @@ public class UserService {
         Optional<Users> dataUser = userRepository.findByUsername(loginRequest.getUsername());
         if(dataUser.isPresent()){
             if (PasswordEncoderUtil.matches(loginRequest.getPassword(),dataUser.get().getPassword())){
-                String token = jwtService.generateToken(loginRequest.getUsername());
-                return new LoginResponse(token);
+                Session session = sessionService.createSessionForUser(dataUser.get().getId());
+                return new LoginResponse(jwtService.generateToken(dataUser.get().getUsername(), session.getId()),
+                        jwtService.generateRefreshToken(dataUser.get().getUsername(), session.getId(), session.getExpSession()));
             }
         }else {
             dataUser = userRepository.findByEmail(loginRequest.getEmail());
             if(dataUser.isPresent()){
                 if (PasswordEncoderUtil.matches(loginRequest.getPassword(),dataUser.get().getPassword())){
-                    String token = jwtService.generateToken(loginRequest.getUsername());
-                    return new LoginResponse(token);
+                    Session session = sessionService.createSessionForUser(dataUser.get().getId());
+                    return new LoginResponse(jwtService.generateToken(dataUser.get().getUsername(), session.getId()),
+                            jwtService.generateRefreshToken(dataUser.get().getUsername(), session.getId(), session.getExpSession()));
                 }
             }
             else {

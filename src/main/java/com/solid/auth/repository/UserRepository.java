@@ -12,8 +12,7 @@ import java.util.Optional;
  * D -> allows high-level modules to use this interface
  */
 
-public interface UserRepository extends JpaRepository<Users,Long>,
-        JpaSpecificationExecutor<Users> {
+public interface UserRepository extends JpaRepository<Users,Long> {
     Optional<Users> findByUsername(String username);
     Optional<Users> findByEmail(String email);
 }

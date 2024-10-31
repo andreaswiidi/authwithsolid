@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "users")
-public class Users {
+public class Users extends BaseModel {
     @Id
     @SequenceGenerator(
             name = "users_pk_seq",
