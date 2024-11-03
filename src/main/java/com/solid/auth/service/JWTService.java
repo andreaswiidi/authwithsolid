@@ -1,15 +1,18 @@
 package com.solid.auth.service;
 
 
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.solid.auth.dto.JWTDto;
 import com.solid.auth.models.Session;
-import com.solid.auth.models.Users;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.KeyFactory;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
 import com.auth0.jwt.JWT;
 
@@ -22,7 +25,17 @@ public class JWTService {
     @Value("${jwt.expiration-time}")
     private int expiration;
 
-    public String generateToken(String username,Long sessionId){
+    private RSAPrivateKey loadPrivateKey() throws Exception {
+        byte[] keyBytes = Files.readAllBytes(Paths.get("src/main/resources/private_key.pem"));
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        return (RSAPrivateKey) keyFactory.generatePrivate(spec);
+    }
+
+    public String generateToken(String username,Long sessionId) throws Exception{
+        RSAPrivateKey privateKey = loadPrivateKey();
+        Algorithm algorithm = Algorithm.RSA256(null, privateKey);
+
         return JWT.create()
                 .withSubject("username")
                 .withClaim("sid", sessionId)
@@ -40,9 +53,17 @@ public class JWTService {
                 .sign(Algorithm.HMAC256(secret));
     }
 
-    public JWTDto generateJWT(Users users, Session session){
-        return new JWTDto(generateToken(users.getUsername(), session.getId()),
-                generateRefreshToken(users.getUsername(), session.getId(), session.getExpSession()));
+    public boolean isTokenValid(String token,String username){
+        try {
+            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret))
+                    .withSubject("username")
+                    .build();
+            verifier.verify(token);
+        }catch (Exception ex){
+            return false;
+        }
+
+        return  true;
     }
 
 }
