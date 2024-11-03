@@ -25,16 +25,6 @@ public class Session extends BaseModel{
     )
     private Long id;
     private Long userId;
+    private String username;
     private Date expSession;
-
-//    public Session(Long userId, Date expDate) {
-//        super();
-//        this.userId = userId;
-//        this.expSession = expDate;
-//    }
-
-//    public Session(Long userId, Date expSession) {
-//        this.userId = userId;
-//        this.expSession = expSession;
-//    }
 }

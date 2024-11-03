@@ -3,8 +3,12 @@ package com.solid.auth.service;
 
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.solid.auth.dto.JWTDto;
-import com.solid.auth.models.Session;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.KeyUse;
+import com.nimbusds.jose.jwk.RSAKey;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +16,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
+import java.util.Map;
+
 import com.auth0.jwt.JWT;
 
 
@@ -21,49 +28,46 @@ import com.auth0.jwt.JWT;
 public class JWTService {
     @Value("${jwt.secret}")
     private String secret;
-
     @Value("${jwt.expiration-time}")
     private int expiration;
+    private final RSAPrivateKey privateKey;
+    private final RSAPublicKey publicKey;
 
-    private RSAPrivateKey loadPrivateKey() throws Exception {
-        byte[] keyBytes = Files.readAllBytes(Paths.get("src/main/resources/private_key.pem"));
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        return (RSAPrivateKey) keyFactory.generatePrivate(spec);
+    @Autowired
+    public JWTService(RSAPrivateKey privateKey, RSAPublicKey publicKey) {
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
     }
 
-    public String generateToken(String username,Long sessionId) throws Exception{
-        RSAPrivateKey privateKey = loadPrivateKey();
-        Algorithm algorithm = Algorithm.RSA256(null, privateKey);
+    public Map<String, Object> getJwkCert() {
+        JWK jwk = new RSAKey.Builder(publicKey)
+                .keyUse(KeyUse.SIGNATURE)
+                .algorithm(JWSAlgorithm.RS256)
+                .keyID("12345")
+                .build();
+
+        return jwk.toJSONObject();
+    }
+
+    public String generateToken(String username,Long sessionId) {
+        Algorithm algorithm = Algorithm.RSA256(publicKey, privateKey);
 
         return JWT.create()
-                .withSubject("username")
+                .withSubject(username)
                 .withClaim("sid", sessionId)
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + expiration))
-                .sign(Algorithm.HMAC256(secret));
+                .sign(algorithm);
     }
 
     public String generateRefreshToken(String username,Long sessionId,Date expSession){
+        Algorithm algorithm = Algorithm.RSA256(publicKey, privateKey);
         return JWT.create()
-                .withSubject("username")
+                .withSubject(username)
                 .withClaim("sid", sessionId)
                 .withIssuedAt(new Date())
                 .withExpiresAt(expSession)
-                .sign(Algorithm.HMAC256(secret));
-    }
-
-    public boolean isTokenValid(String token,String username){
-        try {
-            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret))
-                    .withSubject("username")
-                    .build();
-            verifier.verify(token);
-        }catch (Exception ex){
-            return false;
-        }
-
-        return  true;
+                .sign(algorithm);
     }
 
 }

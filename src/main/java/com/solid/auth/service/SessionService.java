@@ -22,13 +22,14 @@ public class SessionService {
     private int expiration;
 
     @Transactional
-    public Session createSessionForUser(Long userId){
+    public Session createSessionForUser(Long userId,String username){
         Date expDate = Date.from(Instant.now().plus(expiration, ChronoUnit.MINUTES));
         Optional<Session> session = sessionRepository.findByUserId(userId);
         if (session.isEmpty()){
             Session newSession = new Session();
             newSession.setUserId(userId);
             newSession.setExpSession(expDate);
+            newSession.setUsername(username);
             return sessionRepository.save(newSession);
         }
         session.get().setExpSession(expDate);

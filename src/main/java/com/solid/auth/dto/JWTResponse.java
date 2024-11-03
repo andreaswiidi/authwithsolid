@@ -5,11 +5,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class JWTDto {
+public class JWTResponse {
     private String jwtToken;
     private String refreshToken;
 
-    public JWTDto(String jwtToken, String refreshToken) {
+    public JWTResponse(String jwtToken, String refreshToken) {
         this.jwtToken = jwtToken;
         this.refreshToken = refreshToken;
     }
