@@ -1,5 +1,6 @@
 package com.solid.auth.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,11 +15,15 @@ import java.util.Base64;
 
 @Configuration
 public class JWTConfig {
+    @Value("${jwt.private-key}")
+    private String privateKey;
+    @Value("${jwt.public-key}")
+    private String publicKey;
 
     @Bean
     public RSAPrivateKey loadPrivateKey() throws Exception {
-        byte[] keyBytes = Files.readAllBytes(Paths.get("src/main/resources/private_key.pem"));
-        String privateKeyPEM = new String(keyBytes);
+//        byte[] keyBytes = Files.readAllBytes(privateKey);
+        String privateKeyPEM = privateKey;
         privateKeyPEM = privateKeyPEM
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
@@ -31,9 +36,9 @@ public class JWTConfig {
     }
     @Bean
     public RSAPublicKey loadPublicKey() throws Exception {
-        byte[] keyBytes = Files.readAllBytes(Paths.get("src/main/resources/public_key.pem"));
+//        byte[] keyBytes = Files.readAllBytes(Paths.get("src/main/resources/public_key.pem"));
 
-        String publicKeyPEM = new String(keyBytes)
+        String publicKeyPEM = publicKey
                 .replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
                 .replaceAll("\\s+", ""); // Remove any new lines or spaces

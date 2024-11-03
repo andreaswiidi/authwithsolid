@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class MessageExceptionHandler {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<?> badRequest(BadRequestException ex) {
         return ResponseEntity

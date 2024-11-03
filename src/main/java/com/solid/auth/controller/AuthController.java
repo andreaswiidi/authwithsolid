@@ -19,7 +19,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/internal")
+@RequestMapping("/v1")
 public class AuthController {
     private final JWTService jwtService;
     private final SessionService sessionService;
