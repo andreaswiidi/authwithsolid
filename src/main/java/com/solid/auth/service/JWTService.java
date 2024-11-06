@@ -40,30 +40,37 @@ public class JWTService {
     }
 
     public Map<String, Object> getJwkCert() {
-        JWK jwk = new RSAKey.Builder(publicKey)
+        RSAKey.Builder builder = new RSAKey.Builder(publicKey)
                 .keyUse(KeyUse.SIGNATURE)
                 .algorithm(JWSAlgorithm.RS256)
-                .keyID("12345")
-                .build();
+                .keyID("12345");
 
-        return jwk.toJSONObject();
+//        JWK jwk = new RSAKey.Builder(publicKey)
+//                .keyUse(KeyUse.SIGNATURE)
+//                .algorithm(JWSAlgorithm.RS256)
+//                .keyID("12345")
+//                .build();
+
+        return new JWKSet(builder.build()).toJSONObject();
     }
 
-    public String generateToken(String username,Long sessionId) {
+    public String generateToken(String username,Long userId,Long sessionId) {
         Algorithm algorithm = Algorithm.RSA256(publicKey, privateKey);
 
         return JWT.create()
                 .withSubject(username)
+                .withClaim("userid",userId)
                 .withClaim("sid", sessionId)
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + expiration))
                 .sign(algorithm);
     }
 
-    public String generateRefreshToken(String username,Long sessionId,Date expSession){
+    public String generateRefreshToken(String username,Long userId,Long sessionId,Date expSession){
         Algorithm algorithm = Algorithm.RSA256(publicKey, privateKey);
         return JWT.create()
                 .withSubject(username)
+                .withClaim("userid",userId)
                 .withClaim("sid", sessionId)
                 .withIssuedAt(new Date())
                 .withExpiresAt(expSession)

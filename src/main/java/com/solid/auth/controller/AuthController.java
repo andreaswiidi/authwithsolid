@@ -9,17 +9,14 @@ import com.solid.auth.service.SessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/api")
 public class AuthController {
     private final JWTService jwtService;
     private final SessionService sessionService;
@@ -35,10 +32,10 @@ public class AuthController {
     }
 
     @PostMapping("/get-jwt")
-    public ResponseWrapper<JWTResponse> getJWT(JWTReq jwtReq){
+    public ResponseWrapper<JWTResponse> getJWT(@RequestBody JWTReq jwtReq){
         Session session = sessionService.createSessionForUser(jwtReq.getUserId(), jwtReq.getUsername());
-        return new ResponseWrapper<JWTResponse>().success(new JWTResponse(jwtService.generateToken(jwtReq.getUsername(), session.getId()),
-                jwtService.generateRefreshToken(jwtReq.getUsername(), session.getId(),session.getExpSession())));
+        return new ResponseWrapper<JWTResponse>().success(new JWTResponse(jwtService.generateToken(jwtReq.getUsername(),jwtReq.getUserId(),session.getId()),
+                jwtService.generateRefreshToken(jwtReq.getUsername(),jwtReq.getUserId() ,session.getId(),session.getExpSession())));
     }
 
 }
